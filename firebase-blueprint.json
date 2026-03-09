@@ -1,0 +1,74 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Contact": {
+      "title": "Contact",
+      "description": "User's contact list",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "phoneNumber": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "notes": { "type": "string" }
+      },
+      "required": ["userId", "name", "phoneNumber"]
+    },
+    "Call": {
+      "title": "Call",
+      "description": "Call history record",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "contactId": { "type": "string" },
+        "contactName": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "duration": { "type": "number" },
+        "transcription": { "type": "string" },
+        "aiTask": { "type": "string" },
+        "status": { "type": "string", "enum": ["completed", "missed", "failed"] }
+      },
+      "required": ["userId", "timestamp"]
+    },
+    "AITask": {
+      "title": "AI Task",
+      "description": "Predefined tasks for the AI assistant",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "instructions": { "type": "string" }
+      },
+      "required": ["userId", "title", "instructions"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/users/{userId}/contacts/{contactId}": {
+      "schema": "Contact",
+      "description": "User's contacts"
+    },
+    "/users/{userId}/calls/{callId}": {
+      "schema": "Call",
+      "description": "Call history"
+    },
+    "/users/{userId}/tasks/{taskId}": {
+      "schema": "AITask",
+      "description": "AI assistant tasks"
+    }
+  }
+}

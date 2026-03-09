@@ -1,0 +1,77 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    // Collection: /users/{userId}
+    // Fields: uid, email, displayName, photoURL
+    //
+    // Collection: /users/{userId}/contacts/{contactId}
+    // Fields: userId, name, phoneNumber, email, notes
+    //
+    // Collection: /users/{userId}/calls/{callId}
+    // Fields: userId, contactId, contactName, timestamp, duration, transcription, aiTask, status
+    //
+    // Collection: /users/{userId}/tasks/{taskId}
+    // Fields: userId, title, instructions
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email']) &&
+             data.uid is string &&
+             data.email is string;
+    }
+
+    function isValidContact(data) {
+      return data.keys().hasAll(['userId', 'name', 'phoneNumber']) &&
+             data.userId == request.auth.uid &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.phoneNumber is string && data.phoneNumber.size() > 0;
+    }
+
+    function isValidCall(data) {
+      return data.keys().hasAll(['userId', 'timestamp']) &&
+             data.userId == request.auth.uid &&
+             data.timestamp is string;
+    }
+
+    function isValidTask(data) {
+      return data.keys().hasAll(['userId', 'title', 'instructions']) &&
+             data.userId == request.auth.uid &&
+             data.title is string && data.title.size() > 0 &&
+             data.instructions is string && data.instructions.size() > 0;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+      
+      match /contacts/{contactId} {
+        allow read, write: if isOwner(userId);
+      }
+      
+      match /calls/{callId} {
+        allow read, write: if isOwner(userId);
+      }
+      
+      match /tasks/{taskId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+  }
+}

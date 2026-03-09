@@ -1,0 +1,7 @@
+{
+  "name": "AI Voice Call Assistant",
+  "description": "A simulated calling app with a real-time AI assistant that can participate in conversations, follow tasks, and provide transcriptions.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
